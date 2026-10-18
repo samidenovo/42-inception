@@ -1,3 +1,4 @@
 # LOCAL runtime configs and passwords:
 srcs/.env
-secrets/
+secrets/*
+!secrets/*.example
