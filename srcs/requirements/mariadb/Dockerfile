@@ -10,4 +10,4 @@ RUN chmod 755 /usr/local/bin/mariadb-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/mariadb-entrypoint"]
 
-CMD ["mariadbd", "--user=mysql", "--bind-address=0.0.0.0", "--init-file=/run/mariadb-init.sql"]
+CMD ["mariadbd", "--user=mysql", "--bind-address=0.0.0.0"]

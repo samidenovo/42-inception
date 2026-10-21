@@ -71,17 +71,23 @@ if [ ! -d /var/lib/mysql/mysql ]; then
         --skip-test-db
 fi
 
-INIT_FILE=/run/mariadb-init.sql
+INIT_MARKER=/var/lib/mysql/.inception-initialized
 
-{
-    printf "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';\n" "$ROOT_PASSWORD_SQL"
-    printf 'CREATE DATABASE IF NOT EXISTS `%s`;\n' "$MYSQL_DATABASE"
-    printf "CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\n" "$MYSQL_USER" "$DB_PASSWORD_SQL"
-    printf "ALTER USER '%s'@'%%' IDENTIFIED BY '%s';\n" "$MYSQL_USER" "$DB_PASSWORD_SQL"
-    printf "GRANT ALL PRIVILEGES ON \`%s\`.* TO '%s'@'%%';\n" "$MYSQL_DATABASE" "$MYSQL_USER"
-} > "$INIT_FILE"
+if [ ! -f "$INIT_MARKER" ]; then
+    {
+        printf '%s\n' "FLUSH PRIVILEGES;"
+        printf "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';\n" "$ROOT_PASSWORD_SQL"
+        printf 'CREATE DATABASE IF NOT EXISTS `%s`;\n' "$MYSQL_DATABASE"
+        printf "CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\n" "$MYSQL_USER" "$DB_PASSWORD_SQL"
+        printf "ALTER USER '%s'@'%%' IDENTIFIED BY '%s';\n" "$MYSQL_USER" "$DB_PASSWORD_SQL"
+        printf "GRANT ALL PRIVILEGES ON \`%s\`.* TO '%s'@'%%';\n" "$MYSQL_DATABASE" "$MYSQL_USER"
+        printf '%s\n' "FLUSH PRIVILEGES;"
+    } | mariadbd --user=mysql --datadir=/var/lib/mysql --bootstrap
 
-chown mysql:mysql "$INIT_FILE"
-chmod 600 "$INIT_FILE"
+    INIT_MARKER_TMP="${INIT_MARKER}.tmp.$$"
+    : > "$INIT_MARKER_TMP"
+    chmod 600 "$INIT_MARKER_TMP"
+    mv "$INIT_MARKER_TMP" "$INIT_MARKER"
+fi
 
 exec "$@"
