@@ -94,4 +94,10 @@ Real files stay ignored in `secrets/`; safe example templates can be committed.
 AI has been used as a learning guide: explaining concepts, reviewing work, providing evaluation landmarks, and helping plan/testing. All implementation must be understood, written, and verified by the student.
 
 
-ssh to VM: ssh -p 2222 samalves@127.0.0.1
+ssh to VM:
+ssh -p 2222 samalves@127.0.0.1
+
+command to pass files from host to VM:
+tar -C /sgoinfre/goinfre/Perso/samalves/Cloud/inception -cf - . \
+  | ssh -p 2222 samalves@127.0.0.1 \
+    'mkdir -p "$HOME/inception" && tar -xf - -C "$HOME/inception"'

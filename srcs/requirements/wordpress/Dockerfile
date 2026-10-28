@@ -4,6 +4,7 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
+        mariadb-client \
         php8.2-cli \
         php8.2-curl \
         php8.2-fpm \
